@@ -3787,12 +3787,9 @@ export function ModelDropdown({
   }, [models, modelSearch, promotedModelIds]);
   const groupedModels = useMemo(() => {
     if (!groupByProvider) {
-      return [
-        {
-          provider: "models",
-          entries: [...filteredModels].sort((a, b) => a.id.localeCompare(b.id)),
-        },
-      ];
+      // Adapters curate this order (newest release of each family first, older releases
+      // at the end); sorting by id here would scramble it.
+      return [{ provider: "models", entries: filteredModels }];
     }
     const map = new Map<string, AdapterModel[]>();
     for (const model of filteredModels) {
