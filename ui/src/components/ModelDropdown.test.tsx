@@ -55,7 +55,7 @@ const curated = [
 ];
 
 describe("ModelDropdown", () => {
-  it("keeps a curated list in the adapter's order when preserveOrder is set", () => {
+  it("keeps a hand-ordered list in the adapter's order when preserveOrder is set", () => {
     renderOpenDropdown(curated, { preserveOrder: true });
 
     expect(shownModelIds()).toEqual(curated.map((model) => model.id));

@@ -58,7 +58,7 @@ import {
   resolveManagedSandboxEnvironmentId,
 } from "../lib/adapter-test-environment";
 import { environmentDisplayLabel } from "../lib/managed-sandbox-environment";
-import { adapterCuratesModelOrder, extractModelName, extractProviderId } from "../lib/model-utils";
+import { adapterModelOrderIsDiscovered, extractModelName, extractProviderId } from "../lib/model-utils";
 import { queryKeys } from "../lib/queryKeys";
 import { useCompany } from "../context/CompanyContext";
 import {
@@ -1744,7 +1744,7 @@ export function AgentConfigForm(props: AgentConfigFormProps) {
                 allowDefault={adapterType !== "opencode_local" && adapterType !== "pi_local" && adapterType !== "paperclip_runner"}
                 required={adapterType === "opencode_local" || adapterType === "pi_local"}
                 groupByProvider={adapterType === "opencode_local" || adapterType === "pi_local"}
-                preserveOrder={adapterCuratesModelOrder(adapterType)}
+                preserveOrder={!adapterModelOrderIsDiscovered(adapterType)}
                 creatable
                 detectedModel={detectedModel}
                 detectedModelCandidates={[]}
@@ -3791,7 +3791,7 @@ export function ModelDropdown({
   }, [models, modelSearch, promotedModelIds]);
   const groupedModels = useMemo(() => {
     if (!groupByProvider) {
-      // A curated list (newest release of each family first, older releases at the end) is
+      // A hand-ordered list (newest release of each family first, older releases at the end) is
       // shown as the adapter ordered it; a discovered list has no stable order, so sort it.
       const entries = preserveOrder ? filteredModels : [...filteredModels].sort((a, b) => a.id.localeCompare(b.id));
       return [{ provider: "models", entries }];

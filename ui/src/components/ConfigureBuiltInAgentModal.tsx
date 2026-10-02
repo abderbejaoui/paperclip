@@ -22,7 +22,7 @@ import {
   builtInAgentsApi,
   type BuiltInAgentState,
 } from "@/api/builtInAgents";
-import { adapterCuratesModelOrder } from "../lib/model-utils";
+import { adapterModelOrderIsDiscovered } from "../lib/model-utils";
 
 /** Adapters whose config completeness is keyed on a non-empty `model`. */
 function isModelBasedAdapter(adapterType: string): boolean {
@@ -185,7 +185,7 @@ export function ConfigureBuiltInAgentModal({
               allowDefault={adapterType !== "opencode_local"}
               required
               groupByProvider={false}
-              preserveOrder={adapterCuratesModelOrder(adapterType)}
+              preserveOrder={!adapterModelOrderIsDiscovered(adapterType)}
               creatable
             />
           )}

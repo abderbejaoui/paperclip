@@ -16,10 +16,11 @@ export function extractModelName(modelId: string): string {
 }
 
 /**
- * Adapters whose model list is hand-ordered (newest release of each family first, older
- * releases at the end). The model dropdown keeps their order; every other adapter's list is
- * still sorted by id, because a discovered list (Cursor's `agent models`) has no stable order.
+ * Adapters whose model list comes from runtime discovery with no stable order (Cursor's
+ * `agent models` output can change between refreshes). The model dropdown sorts these by id.
+ * Every other adapter hand-orders its list (Claude and Codex by family and version, Gemini with
+ * `Auto` first, ...), and the dropdown shows that list as the adapter advertises it.
  */
-export function adapterCuratesModelOrder(adapterType: string): boolean {
-  return adapterType === "claude_local";
+export function adapterModelOrderIsDiscovered(adapterType: string): boolean {
+  return adapterType === "cursor";
 }
