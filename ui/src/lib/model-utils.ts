@@ -16,11 +16,22 @@ export function extractModelName(modelId: string): string {
 }
 
 /**
- * Adapters whose model list comes from runtime discovery with no stable order (Cursor's
- * `agent models` output can change between refreshes). The model dropdown sorts these by id.
- * Every other adapter hand-orders its list (Claude and Codex by family and version, Gemini with
- * `Auto` first, ...), and the dropdown shows that list as the adapter advertises it.
+ * Built-in adapters whose model list is hand-ordered: Claude and Codex by family and version,
+ * the runner's Codex list, Gemini with `Auto` first, Grok, Kimi, and OpenClaw. The model dropdown
+ * shows these lists as the adapter advertises them. Cursor is left out because its list comes from
+ * `agent models` discovery, whose order can change between refreshes. Adapters not named here,
+ * including externally installed ones, keep the dropdown's alphabetical order.
  */
-export function adapterModelOrderIsDiscovered(adapterType: string): boolean {
-  return adapterType === "cursor";
+const CURATED_MODEL_ORDER_ADAPTERS: ReadonlySet<string> = new Set([
+  "claude_local",
+  "codex_local",
+  "paperclip_runner",
+  "gemini_local",
+  "grok_local",
+  "kimi_local",
+  "openclaw_gateway",
+]);
+
+export function adapterCuratesModelOrder(adapterType: string): boolean {
+  return CURATED_MODEL_ORDER_ADAPTERS.has(adapterType);
 }
