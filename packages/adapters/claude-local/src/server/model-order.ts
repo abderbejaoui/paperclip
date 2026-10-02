@@ -26,6 +26,8 @@ interface ClaudeModelKey {
   minor: number;
   /** Dated snapshot (`-20260529`) or Bedrock revision rather than the bare alias. */
   pinned: boolean;
+  /** Snapshot date as YYYYMMDD, 0 when the id carries none; newer snapshots sort first. */
+  snapshot: number;
 }
 
 export function parseClaudeModelId(id: string): ClaudeModelKey | null {
@@ -33,25 +35,31 @@ export function parseClaudeModelId(id: string): ClaudeModelKey | null {
   // Bedrock ids: us.anthropic.claude-opus-4-6-v1, us.anthropic.claude-sonnet-4-5-20250929-v2:0
   bare = bare.replace(/^[a-z]+\.anthropic\./, "");
   let pinned = false;
+  let snapshot = 0;
   const revision = bare.match(/^(.*)-v\d+(?::\d+)?$/);
   if (revision) {
     bare = revision[1];
     pinned = true;
   }
-  const dated = bare.match(/^(.*)-\d{8}$/);
+  const dated = bare.match(/^(.*)-(\d{8})$/);
   if (dated) {
     bare = dated[1];
     pinned = true;
+    snapshot = Number(dated[2]);
   }
   if (bare.endsWith("-latest")) bare = bare.slice(0, -"-latest".length);
 
   const modern = bare.match(MODERN_ID_RE);
   if (modern) {
-    return { family: FAMILY_RANK[modern[1]], major: Number(modern[2]), minor: Number(modern[3] ?? 0), pinned };
+    return {
+      family: FAMILY_RANK[modern[1]], major: Number(modern[2]), minor: Number(modern[3] ?? 0), pinned, snapshot,
+    };
   }
   const legacy = bare.match(LEGACY_ID_RE);
   if (legacy) {
-    return { family: FAMILY_RANK[legacy[3]], major: Number(legacy[1]), minor: Number(legacy[2] ?? 0), pinned };
+    return {
+      family: FAMILY_RANK[legacy[3]], major: Number(legacy[1]), minor: Number(legacy[2] ?? 0), pinned, snapshot,
+    };
   }
   return null;
 }
@@ -84,6 +92,7 @@ export function sortClaudeModels(models: AdapterModel[]): AdapterModel[] {
           a.key.family - b.key.family
           || compareVersions(b.key, a.key)
           || Number(a.key.pinned) - Number(b.key.pinned)
+          || b.key.snapshot - a.key.snapshot
           || a.index - b.index
         );
       }

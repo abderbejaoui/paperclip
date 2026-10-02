@@ -36,6 +36,20 @@ describe("sortClaudeModels", () => {
     ]);
   });
 
+  it("orders dated snapshots of one release newest first, after the bare alias", () => {
+    const snapshots = [
+      { id: "claude-sonnet-4-5-20250929", label: "Claude Sonnet 4.5 (Sep)" },
+      { id: "claude-sonnet-4-5-20251115", label: "Claude Sonnet 4.5 (Nov)" },
+      { id: "claude-sonnet-4-5", label: "Claude Sonnet 4.5" },
+    ];
+
+    expect(ids(sortClaudeModels(snapshots))).toEqual([
+      "claude-sonnet-4-5",
+      "claude-sonnet-4-5-20251115",
+      "claude-sonnet-4-5-20250929",
+    ]);
+  });
+
   it("reads Bedrock region prefixes and revision suffixes", () => {
     const bedrock = [
       { id: "us.anthropic.claude-sonnet-4-5-20250929-v2:0", label: "Bedrock Sonnet 4.5" },
@@ -65,7 +79,7 @@ describe("parseClaudeModelId", () => {
   it("reads the current and the legacy id schemes", () => {
     expect(parseClaudeModelId("claude-opus-4-8")).toMatchObject({ major: 4, minor: 8, pinned: false });
     expect(parseClaudeModelId("claude-opus-5")).toMatchObject({ major: 5, minor: 0, pinned: false });
-    expect(parseClaudeModelId("claude-3-7-sonnet-20250219")).toMatchObject({ major: 3, minor: 7, pinned: true });
+    expect(parseClaudeModelId("claude-3-7-sonnet-20250219")).toMatchObject({ major: 3, minor: 7, pinned: true, snapshot: 20250219 });
     expect(parseClaudeModelId("claude-3-5-sonnet-latest")).toMatchObject({ major: 3, minor: 5, pinned: false });
     expect(parseClaudeModelId("claude-sonnet-5[1m]")).toMatchObject({ major: 5, minor: 0 });
     expect(parseClaudeModelId("us.anthropic.claude-opus-4-6-v1")).toMatchObject({ major: 4, minor: 6, pinned: true });
